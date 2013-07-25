@@ -1,7 +1,22 @@
 <?php
 
+/**
+ * 
+ * This file is part of the S framework for PHP, a framework based on the O framework.
+ * 
+ * @license http://opensource.org/licenses/GPL-3.0 GPL-3.0
+ * 
+ * @author Vitor de Souza <vitor_souza@outlook.com>
+ * @date 19/07/2013
+ * 
+ * This file is responsible for the login form creation, using the ExtJS framework
+ */
+
+//
 // use O Plugin for integration with ExtJS
 use O\UI\Plugins\ExtJS\Manager as m;
+// use S App
+use S\App;
 
 // get the config
 $cfg = S\App::cfg();
@@ -19,7 +34,7 @@ $base_path = $cfg['paths']['base_path'];
         <script>
             Ext.onReady(function() {
                 Ext.create('Ext.window.Window', {
-                    title: 'Sign In | <?= $title; ?>',
+                    title: '<?= App::t('SIGNIN'); ?> | <?= $title; ?>',
                     height: 170,
                     width: 300,
                     modal: true,
@@ -34,11 +49,11 @@ $base_path = $cfg['paths']['base_path'];
                             url: '<?= $base_path; ?>',
                             bodyStyle: {padding: '10px'},
                             buttons: [{
-                                    text: 'Reset',
+                                    text: '<?= App::t('RESET'); ?>',
                                     handler: function() {this.up('form').getForm().reset();}
                                 }, {
                                     xtype: 'button',
-                                    text: 'Sign In',
+                                    text: '<?= App::t('SIGNIN'); ?>',
                                     formBind: true,
                                     id: 'signin',
                                     disabled: true,
@@ -46,7 +61,7 @@ $base_path = $cfg['paths']['base_path'];
                                         var form = this.up('form').getForm();
                                         form.isValid() && form.submit({
                                             success: function(form, action) {document.location.reload();},
-                                            failure: function(form, action) {Ext.Msg.alert('Failed', action.result.msg || 'Try again later!');}
+                                            failure: function(form, action) {Ext.Msg.alert('<?= App::t('FAILED'); ?>', action.result.msg || '<?= App::t('TRYAGAINLATER'); ?>');}
                                         });
                                     }
                                 }],
@@ -62,11 +77,11 @@ $base_path = $cfg['paths']['base_path'];
                                         xtype: 'textfield'
                                     },
                                     items: [{
-                                            fieldLabel: 'User',
+                                            fieldLabel: '<?= App::t('USERFIELD'); ?>',
                                             name: 'user',
                                             id: 'user'
                                         }, {
-                                            fieldLabel: 'Password',
+                                            fieldLabel: '<?= App::t('PASSWORDFIELD'); ?>',
                                             name: 'pass',
                                             id: 'pass',
                                             inputType: 'password'

@@ -1,5 +1,17 @@
 <?php
 
+/**
+ * 
+ * This file is part of the S framework for PHP, a framework based on the O framework.
+ * 
+ * @license http://opensource.org/licenses/GPL-3.0 GPL-3.0
+ * 
+ * @author Vitor de Souza <vitor_souza@outlook.com>
+ * @date 19/07/2013
+ * 
+ * This file is responsible for the Systems's Window creation, using the ExtJS framework (this is also an example of using m::start, m::end and m::cb methods from the O ExtJS plugin)
+ */
+
 // use O Plugin for integration with ExtJS
 use O\UI\Plugins\ExtJS\Manager as m;
 
@@ -30,7 +42,7 @@ $base_path = rtrim($cfg['paths']['base_path'], '/');
                         url: '<?= $base_path; ?>/systems/' + id,
                         success: function(cfg) {
                             var widget = Ext.widget(cfg.xtype, cfg),
-                                win = Ext.getCmp('s-win');
+                            win = Ext.getCmp('s-win');
                             
                             win.removeAll();
                             cfg.autoShow || win.add(widget);
@@ -42,7 +54,7 @@ $base_path = rtrim($cfg['paths']['base_path'], '/');
         return menu;
     })(<?= $menus; ?>);
     
-    // send the window with the JsonP callback function
+// send the window with the JsonP callback function
 <?= m::cb(); ?>({
     xtype: 'window',
     id: 's-win',

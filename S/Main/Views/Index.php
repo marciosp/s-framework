@@ -1,6 +1,22 @@
 <?php
 
+/**
+ * 
+ * This file is part of the S framework for PHP, a framework based on the O framework.
+ * 
+ * @license http://opensource.org/licenses/GPL-3.0 GPL-3.0
+ * 
+ * @author Vitor de Souza <vitor_souza@outlook.com>
+ * @date 19/07/2013
+ * 
+ * This file is responsible for the main view creation, using the ExtJS framework
+ */
+
+//
+// use O Plugin for integration with ExtJS
 use O\UI\Plugins\ExtJS\Manager as m;
+// use S App
+use S\App;
 
 // get the config
 $cfg = S\App::cfg();
@@ -11,37 +27,57 @@ $base_path = rtrim($cfg['paths']['base_path'], '/');
 // get the menus
 $cfg_menus = $cfg['menus'];
 
-// besides the basic menu config, we have the modules (it expects that each module has a Module.php that returns a config object (in her we expect a key 'menus')
+// besides the basic menu config, we have the modules (it expects that each module has a Module.php that returns a config object containing in it a key 'menus'
 $modules_path = $cfg['paths']['modules_path'];
 if ($modules_path) {
     $module_key = ' @-> ';
+
+    // iterates the modules directory
     foreach (new DirectoryIterator($modules_path) as $fileInfo) {
         if ($fileInfo->isDir() && !$fileInfo->isDot()) {
+
+            // include the Module.php config file
             $module_cfg = include $fileInfo->getPathname() . DIRECTORY_SEPARATOR . 'Module.php';
+
+            // get the menus
             $cfg_menus[$module_cfg['name']] = $module_cfg['menus'];
+
+            // apply to each menu leaf an replace, so we can now below when the menu is from a module and when the menu is not
             array_walk_recursive($cfg_menus[$module_cfg['name']], function(&$v) use($module_key, $fileInfo) {
+
+                        // the menu link of a module changes to: module_name . module_key . menu_id
                         $v = $fileInfo->getFilename() . $module_key . $v;
                     });
         }
     }
 }
 
-// encode the menus, so we can work with them in the javascript
+// encode the menus, so we can work with them in the javascript code below
 $menus = json_encode($cfg_menus);
-
-// app name
-$app_name = $cfg['app']['name'];
 ?>
 <!DOCTYPE html>
 <html>
     <head>
-        <title><?= ($title = $app_name . ' - v' . $cfg['app']['version']); ?></title>
+        <title><?= ($title = $cfg['app']['name'] . ' - v' . $cfg['app']['version']); ?></title>
         <?= m::scripts(); ?>
     </head>
     <body>
         <script>
+            // creates a S global var (the only one!) that contains some useful functions
             var S = (function() {
                 return {
+                    /**
+                     * 
+                     * Load a page
+                     * 
+                     * @param url string The URL where the page will be loaded (using JsonP)
+                     * @param params object Parameters to be send via GET
+                     * 
+                     * @return void
+                     * 
+                     * @author Vitor de Souza <vitor_souza@outlook.com>
+                     * @date 25/07/2013
+                     */
                     load: function(url, params) {
                         Ext.data.JsonP.request({
                             url: url,
@@ -74,6 +110,8 @@ $app_name = $cfg['app']['name'];
                     }
                 }
             })();
+            
+            // create the main component
             Ext.onReady(function() {
                 
                 // create the menus
@@ -88,6 +126,7 @@ $app_name = $cfg['app']['name'];
                         handler: Ext.isObject(m[i]) ? null : (function(id) {
                             return function() {
                                 
+                                // modules treatment
                                 var module_key = '<?= $module_key; ?>', 
                                 module_key_len = module_key.length, 
                                 index = id.indexOf(module_key), 
@@ -119,8 +158,9 @@ $app_name = $cfg['app']['name'];
                     items: Ext.Array.merge(menus, [
                         '->', '-',
                         {xtype: 'tbspacer', width: 50},
+                        // Logout button
                         {
-                            text: 'Logout',
+                            text: '<?= App::t('LOGOUT'); ?>',
                             handler: function() {document.location.href += 'logout';}
                         }
                     ]),
