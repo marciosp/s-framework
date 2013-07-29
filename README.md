@@ -27,7 +27,7 @@ systems
 .htaccess
 ApiLocator.php
 app-config.php
-app.php
+index.php
 SystemLocator.php
 ```
 
@@ -39,12 +39,12 @@ RewriteBase /TestApp
 
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
-RewriteRule .* app.php [L,QSA]
+RewriteRule .* index.php [L,QSA]
 ```
 
 If you know the `.htaccess` sintax you'll see that we are redirecting every request to a single file (our app will be a single page app). Alright, the `.htaccess` is just for this.
 
-Now the `app.php` file:
+Now the `index.php` file:
 
 ```php
 <?php
