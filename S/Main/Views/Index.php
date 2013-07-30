@@ -11,7 +11,6 @@
  * 
  * This file is responsible for the main view creation, using the ExtJS framework
  */
-
 //
 // use O Plugin for integration with ExtJS
 use O\UI\Plugins\ExtJS\Manager as m;
@@ -25,7 +24,7 @@ $cfg = S\App::cfg();
 $base_path = rtrim($cfg['paths']['base_path'], '/');
 
 // get the menus
-$cfg_menus = $cfg['menus'];
+$cfg_menus = is_array($cfg['menus']) ? $cfg['menus'] : call_user_func($cfg['menus']);
 
 // besides the basic menu config, we have the modules (it expects that each module has a Module.php that returns a config object containing in it a key 'menus'
 $modules_path = $cfg['paths']['modules_path'];
