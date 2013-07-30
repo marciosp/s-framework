@@ -180,7 +180,8 @@ class App
                                     $request = new Request;
 
                                     // get the API LOCATOR (check whether the request is coming from a module)
-                                    if ($request->params['module'] && $request->params['module_name']) {
+                                    if (isset($request->params['module']) && $request->params['module'] #
+                                            && isset($request->params['module_name']) && $request->params['module_name']) {
                                         $module_cfg = include rtrim($cfg['paths']['modules_path'], DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $request->params['module_name'] . DIRECTORY_SEPARATOR . 'Module.php';
                                         $locator = $module_cfg['locator']['apis']();
                                     } else {
