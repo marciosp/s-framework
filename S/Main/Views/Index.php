@@ -27,9 +27,9 @@ $base_path = rtrim($cfg['paths']['base_path'], '/');
 $cfg_menus = is_array($cfg['menus']) ? $cfg['menus'] : call_user_func($cfg['menus']);
 
 // besides the basic menu config, we have the modules (it expects that each module has a Module.php that returns a config object containing in it a key 'menus'
-$modules_path = $cfg['paths']['modules_path'];
-if ($modules_path) {
-    $module_key = ' @-> ';
+$module_key = ' @-> ';
+if (isset($cfg['paths']['modules_path'])) {
+    $modules_path = $cfg['paths']['modules_path'];
 
     // iterates the modules directory
     foreach (new DirectoryIterator($modules_path) as $fileInfo) {
