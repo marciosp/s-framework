@@ -280,7 +280,7 @@ class App
                                 'do' => function() use($cfg) {
 
                                     // starts and destroy the session (S login control is made upon session)
-                                    $manager = new SessionManager();
+                                    $manager = SessionManager::instance();
                                     $manager->start();
                                     $manager->destroy();
 
@@ -318,7 +318,7 @@ class App
                                     return true;
 
                                 // checks the Session (if we are logged)
-                                $manager = new SessionManager();
+                                $manager = SessionManager::instance();
                                 $user = new Segment($manager, 'user');
                                 return isset($user->login);
                             }
@@ -369,7 +369,7 @@ class App
                                     if ($cfg['auth']['systems']($request->params['user'], $request->params['pass'])) {
                                         //
                                         // store the user in the session (log in the user)
-                                        $manager = new SessionManager();
+                                        $manager = SessionManager::instance();
                                         $user = new Segment($manager, 'user');
                                         $user->login = $request->params['user'];
 
