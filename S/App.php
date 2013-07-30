@@ -223,7 +223,8 @@ class App
                                     $request = new Request;
 
                                     // get the SYSTEM LOCATOR (check whether the request is coming from a module)
-                                    if ($request->params['module'] && $request->params['module_name']) {
+                                    if (isset($request->params['module']) && $request->params['module'] #
+                                            && isset($request->params['module_name']) && $request->params['module_name']) {
                                         $module_cfg = include rtrim($cfg['paths']['modules_path'], DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $request->params['module_name'] . DIRECTORY_SEPARATOR . 'Module.php';
                                         $locator = $module_cfg['locator']['systems']();
                                     } else {
@@ -338,9 +339,22 @@ class App
         $this->loadTranslations();
 
         // some events (Right before route anything)
-        $register_s = new Hook($app, 'before_route', function($app) {
+        $register_s = new Hook($app, 'before_route', function($app) use($cfg) {
+
+                            // the Loader
+                            $loader = $app->getLoader();
+
                             // register S in the Autoload, so we can create S classes as well as we create O and V classes
-                            $app->getLoader()->registerNamespace('S', __DIR__);
+                            $loader->registerNamespace('S', __DIR__);
+
+                            // if we've passed some extra namespace to add to our Autoloader, here we configure them
+                            if (isset($cfg['autoload'])) {
+                                if (isset($cfg['autoload']['prefixes'])) {
+                                    $loader->registerPrefixes($cfg['autoload']['prefixes']);
+                                } elseif (isset($cfg['autoload']['namespaces'])) {
+                                    $loader->registerNamespaces($cfg['autoload']['namespaces']);
+                                }
+                            }
                         });
 
         // some events (When we have a route that exists but there is a filter that invalidated it)
