@@ -81,31 +81,79 @@ $menus = json_encode($cfg_menus);
                         Ext.data.JsonP.request({
                             url: url,
                             params: params,
-                            success: function(cfg) {
-                                        
-                                // create the widget
-                                var widget = Ext.widget(cfg.xtype, cfg);
-                                        
-                                // if the widget is not rendered yet, we render it inside a wrapper panel
-                                if(widget.xtype !== 'window' && !widget.renderTo) {
-                                            
-                                    // widget title
-                                    var title = widget.title;
-                                    delete widget.title;
-                                            
-                                    // creates a wrapper
-                                    Ext.create('Ext.window.Window', {
-                                        id: 's-wrapper',
-                                        title: title,
-                                        bodyStyle: 'padding: 5px',
-                                        layout: 'fit',
-                                        maximized: true,
-                                        items: widget,
-                                        autoShow: true
-                                    });
-                                }
-                            }
+                            success: this.success.normal,
+                            failure: this.failure
                         });
+                    },
+                    failure: function() {
+                        Ext.Msg.alert('App', 'App failed!');
+                        console.log('FAILED');
+                    },
+                    success: {
+                        /**
+                         * 
+                         * Executed when request is successful and we ARE NOT using S SystemWindow
+                         * 
+                         * @return void
+                         * 
+                         * @author Vitor de Souza <vitor_souza@outlook.com>
+                         * @date 31/07/2013
+                         */
+                        normal: function(cfg) {
+                            
+                            // check for messages
+                            if('success' in cfg && cfg.msg) {
+                                Ext.Msg.alert('App', cfg.msg);
+                                return;
+                            }
+                                    
+                            // create the widget
+                            var widget = Ext.widget(cfg.xtype, cfg);
+                                        
+                            // if the widget is not rendered yet, we render it inside a wrapper panel
+                            if(widget.xtype !== 'window' && !widget.renderTo) {
+                                            
+                                // widget title
+                                var title = widget.title;
+                                delete widget.title;
+                                            
+                                // creates a wrapper
+                                Ext.create('Ext.window.Window', {
+                                    id: 's-wrapper',
+                                    title: title,
+                                    bodyStyle: 'padding: 5px',
+                                    layout: 'fit',
+                                    maximized: true,
+                                    items: widget,
+                                    autoShow: true
+                                });
+                            }
+                        },
+                        /**
+                         * 
+                         * Executed when request is successful and we ARE using S SystemWindow
+                         * 
+                         * @return void
+                         * 
+                         * @author Vitor de Souza <vitor_souza@outlook.com>
+                         * @date 31/07/2013
+                         */
+                        win: function(cfg) {
+                            
+                            // check for messages
+                            if('success' in cfg && cfg.msg) {
+                                Ext.Msg.alert('App', cfg.msg);
+                                return;
+                            }
+                            
+                            // create the widget
+                            var widget = Ext.widget(cfg.xtype, cfg),
+                            win = Ext.getCmp('s-win');
+                            
+                            // remove and show
+                            win.removeAll();
+                            cfg.autoShow || win.add(widget);
+                        }
                     }
                 }
             })();

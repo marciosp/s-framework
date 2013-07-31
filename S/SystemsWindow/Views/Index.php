@@ -11,7 +11,6 @@
  * 
  * This file is responsible for the Systems's Window creation, using the ExtJS framework (this is also an example of using m::start, m::end and m::cb methods from the O ExtJS plugin)
  */
-
 // use O Plugin for integration with ExtJS
 use O\UI\Plugins\ExtJS\Manager as m;
 
@@ -40,13 +39,7 @@ $base_path = rtrim($cfg['paths']['base_path'], '/');
                 return function() {
                     Ext.data.JsonP.request({
                         url: '<?= $base_path; ?>/systems/' + id,
-                        success: function(cfg) {
-                            var widget = Ext.widget(cfg.xtype, cfg),
-                            win = Ext.getCmp('s-win');
-                            
-                            win.removeAll();
-                            cfg.autoShow || win.add(widget);
-                        }
+                        success: S.success.normal
                     });
                 }
             })(m[i])
@@ -54,7 +47,7 @@ $base_path = rtrim($cfg['paths']['base_path'], '/');
         return menu;
     })(<?= $menus; ?>);
     
-// send the window with the JsonP callback function
+    // send the window with the JsonP callback function
 <?= m::cb(); ?>({
     xtype: 'window',
     id: 's-win',

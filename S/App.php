@@ -161,6 +161,8 @@ class App
         // includes the O App file (because autoload is started by O)
         include rtrim($cfg['paths']['O'], DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . 'App.php';
 
+        $me = $this;
+
         // creates the O App
         $app = new \O\App(array(
                     'paths' => array(
@@ -220,7 +222,7 @@ class App
                             //
                             // Systems
                             'systems/{page}[/{action}]' => array(
-                                'do' => function($page, $action = 'init') use($cfg) {
+                                'do' => function($page, $action = 'init') use($cfg, $me) {
                                     $request = new Request;
 
                                     // get the SYSTEM LOCATOR (check whether the request is coming from a module)
@@ -234,6 +236,11 @@ class App
 
                                     // Create the O\Manager
                                     $manager = new \O\Manager($locator, $page, $action);
+
+                                    // fires before execute the controller action, so plugins can configure somethings
+                                    HookManager::fire($me, 'before_action', array($this, $manager, $request));
+
+                                    // execute the action
                                     try {
                                         $response = $manager->exec($request);
                                     }
