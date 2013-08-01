@@ -313,7 +313,7 @@ abstract class Controller extends \O\Controller
         return function($errno, $errstr, $errfile, $errline) {
 
                     // clear the buffer
-                    @ob_clean();
+                    ob_get_contents() && ob_clean();
 
                     // if we are using the @ before the sentence
                     if (error_reporting() === 0)

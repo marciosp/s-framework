@@ -314,8 +314,8 @@ class App
                                 // call user API auth closure (expects return of true or false), passing HTTP BASIC USER and HTTP BASIC PASSWORD 
                                 // (by default, S expects you'll use basic authentication with your webservices)
                                 return $cfg['auth']['apis'](
-                                                $request->basic->user, #
-                                                $request->basic->pass, #
+                                                $request->basic ? $request->basic->user : '', #
+                                                $request->basic ? $request->basic->pass : '', #
                                                 $route, #
                                                 $request
                                 );
