@@ -56,8 +56,13 @@ class Loader
                                 Repo::destroy($manager->controller->id);
 
                                 // and get  a new instance of the controller
+                                $old_controller = $manager->controller;
                                 $rf = new \ReflectionObject($manager->controller);
-                                $manager->setController($rf->newInstance());
+                                $new_controller = $rf->newInstance();
+
+                                // just set the old url_id of the old controller in the new instance
+                                $new_controller->seturlId($old_controller->url_id);
+                                $manager->setController($new_controller);
                             }
                         });
         HookManager::hook($before_action);
