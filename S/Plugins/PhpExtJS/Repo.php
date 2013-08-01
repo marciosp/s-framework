@@ -69,7 +69,7 @@ class Repo
         $segment = new Segment($manager, 'repo');
 
         // get the thing
-        if (isset($segment->things))
+        if (isset($segment->things) && isset($segment->things[$id]))
             return $segment->things[$id];
     }
 

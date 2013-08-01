@@ -86,6 +86,9 @@ abstract class Controller extends \O\Controller
      */
     public function __construct()
     {
+        // error handling
+        set_error_handler($this->errorHandler());
+
         // generates your's controller ID
         $this->id = self::id(get_class($this));
 
@@ -210,7 +213,7 @@ abstract class Controller extends \O\Controller
      * @author Vitor de Souza <vitor_souza@outlook.com>
      * @date 31/07/2013
      */
-    final protected function say($msg)
+    final protected function say($msg, $success = true)
     {
         $this->ob_start = false;
         return array(
@@ -219,7 +222,7 @@ abstract class Controller extends \O\Controller
             ),
             'body' => ob_get_clean() . m::cb() . '(' . Encoder::encode(array(
                 'msg' => $msg,
-                'success' => true
+                'success' => $success
             )) . ');'
         );
     }
@@ -275,6 +278,64 @@ abstract class Controller extends \O\Controller
     {
         $this->url_id = $url_id;
         return $this;
+    }
+
+    /**
+     * 
+     * Send an error to the browser
+     * 
+     * @param string $msg The error msg
+     * 
+     * @return void
+     * 
+     * @author Vitor de Souza <vitor_souza@outlook.com>
+     * @date 01/08/2013
+     */
+    final public function error($msg)
+    {
+        die(m::cb() . '(' . Encoder::encode(array(
+                    'success' => false,
+                    'msg' => $msg
+                )) . ');');
+    }
+
+    /**
+     * 
+     * Get the error handler function (you can overwrite this if you want)
+     * 
+     * @return callable
+     * 
+     * @author Vitor de Souza <vitor_souza@outlook.com>
+     * @date 01/08/2013
+     */
+    protected function errorHandler()
+    {
+        return function($errno, $errstr, $errfile, $errline) {
+
+                    // clear the buffer
+                    @ob_clean();
+
+                    // if we are using the @ before the sentence
+                    if (error_reporting() === 0)
+                        return;
+
+                    // get the constant (E_*)
+                    $constants = get_defined_constants(true);
+                    $errtype = array_search($errno, $constants['Core']);
+
+                    // generates the trace
+                    $exception = new \Exception('');
+                    $trace = str_replace(array("#", "\n"), array("<br />#", ''), $exception->getTraceAsString());
+
+                    // the error message
+                    $error_msg = "<div style='overflow:auto;max-height:300px;max-width:570px;white-space:nowrap;'><b>Type:</b> {$errtype}<br/><b>Err:</b> {$errstr}<br/><b>Errfile:</b> $errfile<br/><b>Errline:</b> {$errline}<br/><b>Trace:</b> <br/>{$trace}</div>";
+
+                    // send the error
+                    $this->error($error_msg);
+
+                    // kill the rest of the execution
+                    die();
+                };
     }
 
 }

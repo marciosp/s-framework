@@ -52,8 +52,13 @@ class Loader
                                 $request->params = json_decode($request->params['i']);
 
                             // when we are opening the page, take off the old controller from the repo
-                            if ('init' === $action)
+                            if ('init' === $action) {
                                 Repo::destroy($manager->controller->id);
+
+                                // and get  a new instance of the controller
+                                $rf = new \ReflectionObject($manager->controller);
+                                $manager->setController($rf->newInstance());
+                            }
                         });
         HookManager::hook($before_action);
 
