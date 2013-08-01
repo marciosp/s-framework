@@ -198,7 +198,7 @@ class App
                                                     isset($request->params['__METHOD']) ? $request->params['__METHOD'] : strtolower($request->getMethod()) #
                                     );
                                     try {
-                                        $response = $manager->exec($request, explode('/', $params));
+                                        $response = $manager->exec($request, $params ? explode('/', $params) : array());
                                     }
                                     // check for HTTP errors
                                     catch (\O\Exceptions\E501 $e) {
