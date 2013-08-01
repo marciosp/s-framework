@@ -54,7 +54,7 @@ class Handler
         $url = 'systems/' . $controller->url_id . '/' . $cfg['method'];
 
         // the params
-        $params = str_replace(array('"%', '%"'), '', Encoder::encode($cfg['params']));
+        $params = isset($cfg['params']) ? str_replace(array('"%', '%"'), '', Encoder::encode($cfg['params'])) : '[]';
 
         // the JS function
         return "%function() { Ext.data.JsonP.request({url:'{$url}',params: {i:JSON.stringify({$params})},failure: S.failure, success: S.success[Ext.getCmp('s-win') ? 'win' : 'normal']}); }%";
