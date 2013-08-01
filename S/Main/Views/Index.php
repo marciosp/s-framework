@@ -81,7 +81,7 @@ $menus = json_encode($cfg_menus);
                         Ext.data.JsonP.request({
                             url: url,
                             params: params,
-                            success: this.success.normal,
+                            success: Ext.getCmp('s-win') ? this.success.win : this.success.normal,
                             failure: this.failure
                         });
                     },

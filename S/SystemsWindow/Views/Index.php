@@ -37,10 +37,7 @@ $base_path = rtrim($cfg['paths']['base_path'], '/');
             } : null,
             handler: Ext.isObject(m[i]) ? null : (function(id) {
                 return function() {
-                    Ext.data.JsonP.request({
-                        url: '<?= $base_path; ?>/systems/' + id,
-                        success: S.success.normal
-                    });
+                    S.load('<?= $base_path; ?>/systems/' + id);
                 }
             })(m[i])
         });
