@@ -210,7 +210,7 @@ class App
                                     }
 
                                     // if your HTTP errors treatment don't stop the script, we stop here in case of a failure
-                                    is_object($response) || die();
+                                    (isset($response) && is_object($response)) || die();
 
                                     // send the response
                                     $response->send();
