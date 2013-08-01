@@ -238,7 +238,7 @@ class App
                                     $manager = new \O\Manager($locator, $page, $action);
 
                                     // fires before execute the controller action, so plugins can configure somethings
-                                    HookManager::fire($me, 'before_action', array($this, $manager, $request));
+                                    HookManager::fire($me, 'before_action', array($this, $manager, $request, $page, $action));
 
                                     // execute the action
                                     try {

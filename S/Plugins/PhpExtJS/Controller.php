@@ -260,4 +260,21 @@ abstract class Controller extends \O\Controller
         Repo::store($this->id, $this);
     }
 
+    /**
+     * 
+     * store the Controller with all the changes in the Repo in each request
+     * 
+     * @param string $url_id The URL_ID
+     * 
+     * @return Controller
+     * 
+     * @author Vitor de Souza <vitor_souza@outlook.com>
+     * @date 01/08/2013
+     */
+    final public function setUrlId($url_id)
+    {
+        $this->url_id = $url_id;
+        return $this;
+    }
+
 }

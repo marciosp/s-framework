@@ -73,4 +73,26 @@ class Repo
             return $segment->things[$id];
     }
 
+    /**
+     * 
+     * Destroy something
+     * 
+     * @param string $id The ID used to store the thing
+     * 
+     * @return mixed The thing
+     * 
+     * @author Vitor de Souza <vitor_souza@outlook.com>
+     * @date 01/08/2013
+     * 
+     */
+    public static function destroy($id)
+    {
+        $manager = SessionManager::instance();
+        $segment = new Segment($manager, 'repo');
+
+        // destroy the thing
+        if (isset($segment->things))
+            unset($segment->things[$id]);
+    }
+
 }

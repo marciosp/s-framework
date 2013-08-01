@@ -45,9 +45,15 @@ class Loader
     {
 
         // first of all, we can configure the hook before_action, so we can handle the request before it gets to the action
-        $before_action = new Hook('S\\App', 'before_action', function($app, $manager, $request) {
+        $before_action = new Hook('S\\App', 'before_action', function($app, $manager, $request, $page, $action) {
+
+                            // decode the parameters
                             if (isset($request->params['i']))
                                 $request->params = json_decode($request->params['i']);
+
+                            // when we are opening the page, take off the old controller from the repo
+                            if ('init' === $action)
+                                Repo::destroy($manager->controller->id);
                         });
         HookManager::hook($before_action);
 
@@ -62,7 +68,7 @@ class Loader
 
         // return a new instance if the controller isn't in the repo
         $new_controller = new $controller_name;
-        $new_controller->url_id = $controller_url_id;
+        $new_controller->setUrlId($controller_url_id);
 
         // return the new Controller
         return $new_controller;
