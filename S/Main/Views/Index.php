@@ -16,6 +16,8 @@
 use O\UI\Plugins\ExtJS\Manager as m;
 // use S App
 use S\App;
+// use V.Hook
+use V\Hook\Manager as HookManager;
 
 // get the config
 $cfg = S\App::cfg();
@@ -53,6 +55,11 @@ if (isset($cfg['paths']['modules_path'])) {
 
 // encode the menus, so we can work with them in the javascript code below
 $menus = json_encode($cfg_menus);
+
+// plugins
+$plugins = str_replace(array('"%', '%"'), '', json_encode(array_map(function($v) {
+                            return $v->result;
+                        }, HookManager::fire($this, 'toolbar'))));
 ?>
 <!DOCTYPE html>
 <html>
@@ -202,8 +209,8 @@ $menus = json_encode($cfg_menus);
                 
                 // creates the Toolbar
                 Ext.create('Ext.Toolbar', {
-                    items: Ext.Array.merge(menus, [
-                        '->', '-',
+                    items: Ext.Array.merge(menus, ['->'], <?= $plugins; ?>, [
+                        '-',
                         {xtype: 'tbspacer', width: 50},
                         // Logout button
                         {

@@ -475,4 +475,19 @@ class App
         return self::$t->get($text);
     }
 
+    /**
+     * 
+     * User's session data access
+     * 
+     * @return V\Session\Segment
+     * 
+     * @author Vitor de Souza <vitor_souza@outlook.com>
+     * @date 02/08/2013
+     */
+    public static function user()
+    {
+        $manager = SessionManager::instance();
+        return new Segment($manager, 'user');
+    }
+
 }
