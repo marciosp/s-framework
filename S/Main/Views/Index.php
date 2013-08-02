@@ -113,6 +113,9 @@ $plugins = str_replace(array('"%', '%"'), '', json_encode(array_map(function($v)
                                 Ext.Msg.alert('App', cfg.msg);
                                 return;
                             }
+                            
+                            // stop if we don't want to load a widget
+                            if(!('xtype' in cfg)) return;
                                     
                             // create the widget
                             var widget = Ext.widget(cfg.xtype, cfg);
@@ -153,6 +156,9 @@ $plugins = str_replace(array('"%', '%"'), '', json_encode(array_map(function($v)
                                 return;
                             }
                             
+                            // stop if we don't want to load a widget
+                            if(!('xtype' in cfg)) return;
+                                    
                             // create the widget
                             var widget = Ext.widget(cfg.xtype, cfg),
                             win = Ext.getCmp('s-win');
