@@ -22,6 +22,11 @@ use V\Hook\Manager as HookManager;
 // get the config
 $cfg = S\App::cfg();
 
+// extra head
+$e_head = '';
+if (isset($cfg['head']))
+    $e_head = implode("\n", $cfg['head']);
+
 // base path
 $base_path = rtrim($cfg['paths']['base_path'], '/');
 
@@ -66,6 +71,7 @@ $plugins = str_replace(array('"%', '%"'), '', json_encode(array_map(function($v)
     <head>
         <title><?= ($title = $cfg['app']['name'] . ' - v' . $cfg['app']['version']); ?></title>
         <?= m::scripts(); ?>
+        <?= $e_head; ?>
     </head>
     <body>
         <script>

@@ -11,7 +11,6 @@
  * 
  * This file is responsible for the login form creation, using the ExtJS framework
  */
-
 //
 // use O Plugin for integration with ExtJS
 use O\UI\Plugins\ExtJS\Manager as m;
@@ -21,6 +20,11 @@ use S\App;
 // get the config
 $cfg = S\App::cfg();
 
+// extra head
+$e_head = '';
+if (isset($cfg['head']))
+    $e_head = implode("\n", $cfg['head']);
+
 // get the base path
 $base_path = $cfg['paths']['base_path'];
 ?>
@@ -29,6 +33,7 @@ $base_path = $cfg['paths']['base_path'];
     <head>
         <title><?= ($title = $cfg['app']['name'] . ' - v' . $cfg['app']['version']); ?></title>
         <?= m::scripts(); ?>
+        <?= $e_head; ?>
     </head>
     <body>
         <script>
