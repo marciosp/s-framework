@@ -75,6 +75,26 @@ class Widget
         // set the widget xtype
         $widget->xtype = strtolower(isset(self::$alias[$name]) ? self::$alias[$name] : $name);
 
+        // get the config
+        $cfg = \S\App::cfg();
+
+        // get the custom properties config
+        if (isset($cfg['plugins']['PhpExtJS']['widgets'])) {
+            if (isset($cfg['plugins']['PhpExtJS']['widgets'][$widget->xtype])) {
+                if (isset($cfg['plugins']['PhpExtJS']['widgets'][$widget->xtype]['default'])) {
+                    foreach ($cfg['plugins']['PhpExtJS']['widgets'][$widget->xtype]['default'] as $key => $value) {
+                        if (!isset($widget->$key))
+                            $widget->$key = $value;
+                    }
+                }
+                if (isset($cfg['plugins']['PhpExtJS']['widgets'][$widget->xtype]['overwrite'])) {
+                    foreach ($cfg['plugins']['PhpExtJS']['widgets'][$widget->xtype]['overwrite'] as $key => $value) {
+                        $widget->$key = $value;
+                    }
+                }
+            }
+        }
+
         // return the widget
         return $widget;
     }
