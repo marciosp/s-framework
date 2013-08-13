@@ -136,7 +136,7 @@ abstract class Controller extends \O\Controller
     final protected function setView(View $view)
     {
         $this->view = $view;
-        $this->view->controller = $this;
+        $this->view->setController($this);
         return $this;
     }
 

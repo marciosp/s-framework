@@ -60,10 +60,13 @@ class Widget
      * @return Widget
      * 
      * @author Vitor de Souza <vitor_souza@outlook.com>
-     * @date 31/07/2013
+     * @date 31/07/2013 | 06/08/2013
      */
     public static function __callStatic($name, $args)
     {
+
+        // normalize the XTYPE
+        $name = strtolower($name);
 
         // create an empty widget
         $widget = new self;
@@ -73,7 +76,7 @@ class Widget
             $widget->$k = $v;
 
         // set the widget xtype
-        $widget->xtype = strtolower(isset(self::$alias[$name]) ? self::$alias[$name] : $name);
+        $widget->xtype = isset(self::$alias[$name]) ? self::$alias[$name] : $name;
 
         // get the config
         $cfg = \S\App::cfg();

@@ -20,7 +20,7 @@ use S\App;
 // get the config
 $cfg = S\App::cfg();
 
-// extra head
+// extra head files (.css & .js, for example)
 $e_head = '';
 if (isset($cfg['head']))
     $e_head = implode("\n", $cfg['head']);

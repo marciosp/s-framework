@@ -33,7 +33,7 @@ class Handler
      * @return string the JS function
      * 
      * @author Vitor de Souza <vitor_souza@outlook.com>
-     * @date 31/07/2013
+     * @date 31/07/2013 | 13/08/2013
      * 
      * The config array must have these keys:
      *      'controller' - The controller instance
@@ -50,21 +50,21 @@ class Handler
         // store the controller
         Repo::store($controller->id, $controller);
 
-        // take "Controller" of the URL and add the METHOD in the END (S pattern URL of method call)
+        // S pattern URL of method call
         $url = 'systems/' . $controller->url_id . '/' . $cfg['method'];
 
         // the params
         $params = isset($cfg['params']) ? str_replace(array('"%', '%"'), '', Encoder::encode($cfg['params'])) : '[]';
 
         // the JS function
-        return "%function() { Ext.data.JsonP.request({url:'{$url}',params: {i:JSON.stringify({$params})},failure: S.failure, success: S.success[Ext.getCmp('s-win') ? 'win' : 'normal']}); }%";
+        return "%function() { S.s();Ext.data.JsonP.request({url:'{$url}',params: {i:JSON.stringify({$params})},failure: S.failure, success: S.success[Ext.getCmp('s-win') ? 'win' : 'normal']}); }%";
     }
 
     /**
      * 
      * Returns an pure JS function to execute only JS stuff
      * 
-     * @param array $codes an array os JS codes, without the ";" at the end
+     * @param array $codes an array of JS codes, without the ";" at the end
      * 
      * @return string the JS function
      * 
@@ -79,7 +79,7 @@ class Handler
 
     /**
      * 
-     * Returns an pure JS function to execute when a given KEY is pressed (must be put in a listener specialkey, for example)
+     * Returns a pure JS function to execute when a given KEY is pressed (must be put in a listener specialkey, for example)
      * 
      * @param array $cfg a config array
      * 

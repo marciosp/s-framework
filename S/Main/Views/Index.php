@@ -22,7 +22,7 @@ use V\Hook\Manager as HookManager;
 // get the config
 $cfg = S\App::cfg();
 
-// extra head
+// extra head files (.css & .js, for example)
 $e_head = '';
 if (isset($cfg['head']))
     $e_head = implode("\n", $cfg['head']);
@@ -77,28 +77,46 @@ $plugins = str_replace(array('"%', '%"'), '', json_encode(array_map(function($v)
         <script>
             // creates a S global var (the only one!) that contains some useful functions
             var S = (function() {
+                
+                // show and hide private methods
+                var s = function () {
+                    var cp = Ext.WindowManager.getActive();
+                    cp ? cp.setLoading(true) : Ext.getBody().mask('Loading...');
+                }, h = function () {
+                    var cp = Ext.WindowManager.getActive();
+                    cp ? cp.setLoading(false) : Ext.getBody().unmask();
+                };
+                
+                // the return object
                 return {
+                    // mask and unmask functions
+                    h: h,
+                    s: s,
                     /**
                      * 
                      * Load a page
                      * 
                      * @param url string The URL where the page will be loaded (using JsonP)
                      * @param params object Parameters to be send via GET
+                     * @param fn_s function A function to be executed after request succeed
+                     * @param fn_f function A function to be executed after request failure
                      * 
                      * @return void
                      * 
                      * @author Vitor de Souza <vitor_souza@outlook.com>
-                     * @date 25/07/2013
+                     * @date 25/07/2013 | 09/08/2013
                      */
-                    load: function(url, params) {
+                    load: function(url, params, fn_s, fn_f) {
+                        s();
                         Ext.data.JsonP.request({
                             url: url,
                             params: params,
-                            success: Ext.getCmp('s-win') ? this.success.win : this.success.normal,
-                            failure: this.failure
+                            success: Ext.Function.createSequence(Ext.getCmp('s-win') ? this.success.win : this.success.normal, fn_s || Ext.emptyFn),
+                            failure: Ext.Function.createSequence(this.failure, fn_f || Ext.emptyFn)
                         });
                     },
                     failure: function() {
+                        h();
                         Ext.Msg.alert('App', 'App failed!');
                         console.log('FAILED');
                     },
@@ -113,7 +131,7 @@ $plugins = str_replace(array('"%', '%"'), '', json_encode(array_map(function($v)
                          * @date 31/07/2013
                          */
                         normal: function(cfg) {
-                            
+                            h();
                             // check for messages
                             if('success' in cfg && cfg.msg) {
                                 Ext.Msg.alert('App', cfg.msg);
@@ -155,7 +173,7 @@ $plugins = str_replace(array('"%', '%"'), '', json_encode(array_map(function($v)
                          * @date 31/07/2013
                          */
                         win: function(cfg) {
-                            
+                            h();
                             // check for messages
                             if('success' in cfg && cfg.msg) {
                                 Ext.Msg.alert('App', cfg.msg);
@@ -179,6 +197,9 @@ $plugins = str_replace(array('"%', '%"'), '', json_encode(array_map(function($v)
             
             // create the main component
             Ext.onReady(function() {
+                
+                // body unselectable
+                Ext.getBody().el.unselectable();
                 
                 // create the menus
                 var menus = (function buildMenus(m) {

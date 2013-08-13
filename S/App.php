@@ -58,7 +58,7 @@ class App
 
     /**
      * 
-     * The V\I18n\Translator object
+     * The Translator object
      * 
      * @var V\I18n\Translator
      * 
@@ -100,6 +100,15 @@ class App
         $this->loadO();
     }
 
+    /**
+     * 
+     * Loads the translations
+     * 
+     * @return void
+     * 
+     * @author Vitor de Souza <vitor_souza@outlook.com>
+     * @date 22/07/2013
+     */
     private function loadTranslations()
     {
         $cfg = self::$cfg;
@@ -147,7 +156,7 @@ class App
 
     /**
      * 
-     * Loads O framework correctly
+     * Loads O framework
      * 
      * @return void
      * 
@@ -197,6 +206,8 @@ class App
                                                     // check for custom services that are not named "get", "post", "put" and "delete" in the __METHOD parameter
                                                     isset($request->params['__METHOD']) ? $request->params['__METHOD'] : strtolower($request->getMethod()) #
                                     );
+
+                                    // exec the service
                                     try {
                                         $response = $manager->exec($request, $params ? explode('/', $params) : array());
                                     }
@@ -223,6 +234,8 @@ class App
                             // Systems
                             'systems/{page}[/{action}]' => array(
                                 'do' => function($page, $action = 'init') use($cfg, $me) {
+                                    ob_start();
+
                                     $request = new Request;
 
                                     // get the SYSTEM LOCATOR (check whether the request is coming from a module)
@@ -254,7 +267,13 @@ class App
                                     }
 
                                     // if your HTTP errors treatment don't stop the script, we stop here in case of a failure
-                                    is_object($response) || die();
+                                    (isset($response) && is_object($response)) || die();
+
+                                    // get the output untill now
+                                    $untill_now = ob_get_clean();
+
+                                    // add the output untill now to the response object (to avoid: cannot modify headers inform...)
+                                    $response->message->setBody($untill_now . $response->message->getBody());
 
                                     // send the response
                                     $response->send();
@@ -313,12 +332,24 @@ class App
                                 //
                                 // call user API auth closure (expects return of true or false), passing HTTP BASIC USER and HTTP BASIC PASSWORD 
                                 // (by default, S expects you'll use basic authentication with your webservices)
-                                return $cfg['auth']['apis'](
-                                                $request->basic ? $request->basic->user : '', #
-                                                $request->basic ? $request->basic->pass : '', #
-                                                $route, #
-                                                $request
+                                $result = $cfg['auth']['apis'](
+                                        $request->basic ? $request->basic->user : '', #
+                                        $request->basic ? $request->basic->pass : '', #
+                                        $route, #
+                                        $request
                                 );
+
+                                // if the user and password are OK!
+                                if ($result && $request->basic) {
+
+                                    // store the user in the session (log in the user)
+                                    $manager = SessionManager::instance();
+                                    $user = new Segment($manager, 'user');
+                                    $user->login = $request->basic->user;
+                                }
+
+                                // return the result
+                                return $result;
                             },
                             'auth_systems' => function(RouteInterface $route, RequestInterface $request) use($cfg) {
 

@@ -92,4 +92,21 @@ FILE;
         return $this->$name;
     }
 
+    /**
+     * 
+     * $controller mutator
+     * 
+     * @param Controller $controller A Controller object
+     * 
+     * @return View
+     * 
+     * @author Vitor de Souza <vitor_souza@outlook.com>
+     * @date 13/08/2013
+     */
+    public function setController(Controller $controller)
+    {
+        $this->controller = $controller;
+        return $this;
+    }
+
 }

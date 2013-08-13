@@ -61,7 +61,9 @@ class Loader
                                 $new_controller = $rf->newInstance();
 
                                 // just set the old url_id of the old controller in the new instance
-                                $new_controller->seturlId($old_controller->url_id);
+                                $new_controller->setUrlId($old_controller->url_id);
+
+                                // updates the controller in the manager
                                 $manager->setController($new_controller);
                             }
                         });
@@ -69,6 +71,7 @@ class Loader
 
         // get the controller's ID
         $id = $controller_name::id();
+
         // get the controller from the repo
         $controller = Repo::get($id);
 
