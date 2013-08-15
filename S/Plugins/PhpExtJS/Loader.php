@@ -49,7 +49,7 @@ class Loader
 
                             // decode the parameters
                             if (isset($request->params['i']))
-                                $request->params = json_decode($request->params['i']);
+                                $request->params = Decoder::decode($request->params['i']);
 
                             // when we are opening the page, take off the old controller from the repo
                             if ('init' === $action) {
