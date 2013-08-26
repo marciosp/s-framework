@@ -191,9 +191,9 @@ class App
                                     $request = new Request;
 
                                     // get the API LOCATOR (check whether the request is coming from a module)
-                                    if (isset($request->params['module']) && $request->params['module'] #
-                                            && isset($request->params['module_name']) && $request->params['module_name']) {
-                                        $module_cfg = include rtrim($cfg['paths']['modules_path'], DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $request->params['module_name'] . DIRECTORY_SEPARATOR . 'Module.php';
+                                    if (isset($_GET['module']) && $_GET['module'] #
+                                            && isset($_GET['module_name']) && $_GET['module_name']) {
+                                        $module_cfg = include rtrim($cfg['paths']['modules_path'], DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $_GET['module_name'] . DIRECTORY_SEPARATOR . 'Module.php';
                                         $locator = $module_cfg['locator']['apis']();
                                     } else {
                                         $locator = $cfg['locator']['apis']();
@@ -204,7 +204,7 @@ class App
                                                     $locator, #
                                                     $api, #
                                                     // check for custom services that are not named "get", "post", "put" and "delete" in the __METHOD parameter
-                                                    isset($request->params['__METHOD']) ? $request->params['__METHOD'] : strtolower($request->getMethod()) #
+                                                    isset($_GET['__METHOD']) ? $_GET['__METHOD'] : strtolower($request->getMethod()) #
                                     );
 
                                     // exec the service
@@ -239,9 +239,9 @@ class App
                                     $request = new Request;
 
                                     // get the SYSTEM LOCATOR (check whether the request is coming from a module)
-                                    if (isset($request->params['module']) && $request->params['module'] #
-                                            && isset($request->params['module_name']) && $request->params['module_name']) {
-                                        $module_cfg = include rtrim($cfg['paths']['modules_path'], DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $request->params['module_name'] . DIRECTORY_SEPARATOR . 'Module.php';
+                                    if (isset($_GET['module']) && $_GET['module'] #
+                                            && isset($_GET['module_name']) && $_GET['module_name']) {
+                                        $module_cfg = include rtrim($cfg['paths']['modules_path'], DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $_GET['module_name'] . DIRECTORY_SEPARATOR . 'Module.php';
                                         $locator = $module_cfg['locator']['systems']();
                                     } else {
                                         $locator = $cfg['locator']['systems']();

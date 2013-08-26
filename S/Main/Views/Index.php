@@ -188,8 +188,10 @@ $plugins = str_replace(array('"%', '%"'), '', json_encode(array_map(function($v)
                             win = Ext.getCmp('s-win');
                             
                             // remove and show
-                            win.removeAll();
-                            cfg.autoShow || win.add(widget);
+                            if(!cfg.autoShow) {
+                                win.removeAll();
+                                win.add(widget);
+                            }
                         }
                     }
                 }
