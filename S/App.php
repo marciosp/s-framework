@@ -374,6 +374,10 @@ class App
                     )
                 ));
 
+        // error & exception handling
+        isset($cfg['error_handler']) && is_callable($cfg['error_handler']) && set_error_handler($cfg['error_handler']);
+        isset($cfg['exception_handler']) && is_callable($cfg['exception_handler']) && set_exception_handler($cfg['exception_handler']);
+
         // load translations stuff
         $this->loadTranslations();
 

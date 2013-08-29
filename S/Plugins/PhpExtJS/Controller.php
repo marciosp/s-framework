@@ -89,6 +89,9 @@ abstract class Controller extends \O\Controller
         // error handling
         set_error_handler($this->errorHandler());
 
+        // exception handling
+        set_exception_handler($this->exceptionHandler());
+
         // generates your's controller ID
         $this->id = self::id(get_class($this));
 
@@ -293,6 +296,22 @@ abstract class Controller extends \O\Controller
      */
     final public function error($msg)
     {
+        self::err($msg);
+    }
+
+    /**
+     * 
+     * Send an error to the browser (static)
+     * 
+     * @param string $msg The error msg
+     * 
+     * @return void
+     * 
+     * @author Vitor de Souza <vitor_souza@outlook.com>
+     * @date 29/08/2013
+     */
+    final public static function err($msg)
+    {
         die(m::cb() . '(' . Encoder::encode(array(
                     'success' => false,
                     'msg' => $msg
@@ -301,14 +320,14 @@ abstract class Controller extends \O\Controller
 
     /**
      * 
-     * Get the error handler function (you can overwrite this if you want)
+     * Get the error handler function (you can use this function to apply to the config of S framework)
      * 
      * @return callable
      * 
      * @author Vitor de Souza <vitor_souza@outlook.com>
      * @date 01/08/2013
      */
-    protected function errorHandler()
+    public static function errorHandler()
     {
         return function($errno, $errstr, $errfile, $errline) {
 
@@ -331,7 +350,40 @@ abstract class Controller extends \O\Controller
                     $error_msg = "<div style='overflow:auto;max-height:300px;max-width:570px;white-space:nowrap;'><b>Type:</b> {$errtype}<br/><b>Err:</b> {$errstr}<br/><b>Errfile:</b> $errfile<br/><b>Errline:</b> {$errline}<br/><b>Trace:</b> <br/>{$trace}</div>";
 
                     // send the error
-                    $this->error($error_msg);
+                    Controller::err($error_msg);
+
+                    // kill the rest of the execution
+                    die();
+                };
+    }
+
+    /**
+     * 
+     * Get the exception handler function (you can use this function to apply to the config of S framework)
+     * 
+     * @return callable
+     * 
+     * @author Vitor de Souza <vitor_souza@outlook.com>
+     * @date 29/08/2013
+     */
+    public static function exceptionHandler()
+    {
+        return function(\Exception $e) {
+
+                    // clear the buffer
+                    ob_get_contents() && ob_clean();
+
+                    // generates the trace
+                    $trace = str_replace(array("#", "\n"), array("<br />#", ''), $e->getTraceAsString());
+
+                    // the message
+                    $msg = nl2br($e->getMessage());
+
+                    // the exception message
+                    $exception_msg = "<div style='overflow:auto;max-height:300px;max-width:570px;white-space:nowrap;'><b>Type:</b> " . get_class($e) . "<br/><b>Exception:</b> {$msg}<br/><b>Exceptionfile:</b> {$e->getFile()}<br/><b>Exceptionline:</b> {$e->getLine()}<br/><b>Trace:</b> <br/>{$trace}</div>";
+
+                    // send the exception
+                    Controller::err($exception_msg);
 
                     // kill the rest of the execution
                     die();
