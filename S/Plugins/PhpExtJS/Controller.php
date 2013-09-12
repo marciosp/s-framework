@@ -232,6 +232,22 @@ abstract class Controller extends \O\Controller
 
     /**
      * 
+     * Tells the App everything worked fine - static
+     * 
+     * @return array
+     * 
+     * @author Vitor de Souza <vitor_souza@outlook.com>
+     * @date 31/07/2013 | 04/09/2013
+     */
+    final public static function finish()
+    {
+        die(ob_get_clean() . m::cb() . '(' . Encoder::encode(array(
+                    'success' => true
+                )) . ');');
+    }
+
+    /**
+     * 
      * Tells the App everything worked fine
      * 
      * @return array

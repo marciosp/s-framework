@@ -72,7 +72,7 @@ class Widget
         $widget = new self;
 
         // widget properties, it expects W::myWidget(array('key' => 'value', ...));
-        foreach ($args[0] as $k => $v)
+        foreach ((array) @$args[0] as $k => $v)
             $widget->$k = $v;
 
         // set the widget xtype

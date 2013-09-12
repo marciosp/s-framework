@@ -174,6 +174,7 @@ class App
 
         // creates the O App
         $app = new \O\App(array(
+                    'environment' => $cfg['environment'],
                     'paths' => array(
                         // V Path
                         'V' => $cfg['paths']['V']

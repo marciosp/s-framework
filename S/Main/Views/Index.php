@@ -243,7 +243,10 @@ $plugins = str_replace(array('"%', '%"'), '', json_encode(array_map(function($v)
                 })(<?= $menus; ?>);
                 
                 // creates the Toolbar
-                Ext.create('Ext.Toolbar', {
+                var tbar = Ext.create('Ext.Toolbar', {
+                    layout: {
+                        overflowHandler: 'Menu'
+                    },
                     items: Ext.Array.merge(menus, ['->'], <?= $plugins; ?>, [
                         '-',
                         {xtype: 'tbspacer', width: 50},
@@ -254,6 +257,11 @@ $plugins = str_replace(array('"%', '%"'), '', json_encode(array_map(function($v)
                         }
                     ]),
                     renderTo: Ext.getBody()
+                });
+                
+                // refresh the layout of the TBAR on window resize
+                Ext.EventManager.onWindowResize(function(){
+                    tbar.doLayout();
                 });
             });
         </script>

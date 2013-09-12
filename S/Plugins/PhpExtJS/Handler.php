@@ -39,6 +39,7 @@ class Handler
      *      'controller' - The controller instance
      *      'method' - The controller's method to execute in the request
      *      'params' - The parameters to pass (an array of identifier => javascript codes that get values of the template)
+     *      'form_id' - The form ID (optional - if passed, will exec the form.isValid() function before anything and only proceed if it returns true)
      * 
      */
     public static function ajax(array $cfg)
@@ -56,8 +57,11 @@ class Handler
         // the params
         $params = isset($cfg['params']) ? str_replace(array('"%', '%"'), '', Encoder::encode($cfg['params'])) : '[]';
 
+        // form validation
+        $check_form = isset($cfg['form_id']) ? "if(!Ext.getCmp('{$cfg['form_id']}').getForm().isValid())return;" : '';
+
         // the JS function
-        return "%function() { S.s();Ext.data.JsonP.request({url:'{$url}',params: {i:JSON.stringify({$params})},failure: S.failure, success: S.success[Ext.getCmp('s-win') ? 'win' : 'normal']}); }%";
+        return "%function() { {$check_form} S.s();Ext.data.JsonP.request({url:'{$url}',params: {i:JSON.stringify({$params})},failure: S.failure, success: S.success[Ext.getCmp('s-win') ? 'win' : 'normal']}); }%";
     }
 
     /**
