@@ -358,6 +358,17 @@ abstract class Controller extends \O\Controller
                     $constants = get_defined_constants(true);
                     $errtype = array_search($errno, $constants['Core']);
 
+                    // check for REST Request (the error must be sent in json instead of HTML)
+                    $cfg = \S\App::cfg();
+                    if (false !== strpos(trim($_SERVER['REQUEST_URI'], '/'), trim($cfg['paths']['base_path'], '/') . '/webservices/')) {
+                        die(Encoder::encode(array(
+                                    'errtype' => $errtype,
+                                    'err' => $errstr,
+                                    'errfile' => $errfile,
+                                    'errline' => $errline
+                                )));
+                    }
+
                     // generates the trace
                     $exception = new \Exception('');
                     $trace = str_replace(array("#", "\n"), array("<br />#", ''), $exception->getTraceAsString());
@@ -388,6 +399,17 @@ abstract class Controller extends \O\Controller
 
                     // clear the buffer
                     ob_get_contents() && ob_clean();
+
+                    // check for REST Request (the error must be sent in json instead of HTML)
+                    $cfg = \S\App::cfg();
+                    if (false !== strpos(trim($_SERVER['REQUEST_URI'], '/'), trim($cfg['paths']['base_path'], '/') . '/webservices/')) {
+                        die(Encoder::encode(array(
+                                    'exceptiontype' => get_class($e),
+                                    'exception' => $e->getMessage(),
+                                    'exceptionfile' => $e->getFile(),
+                                    'exceptionline' => $e->getLine()
+                                )));
+                    }
 
                     // generates the trace
                     $trace = str_replace(array("#", "\n"), array("<br />#", ''), $e->getTraceAsString());

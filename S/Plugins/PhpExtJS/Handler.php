@@ -40,6 +40,7 @@ class Handler
      *      'method' - The controller's method to execute in the request
      *      'params' - The parameters to pass (an array of identifier => javascript codes that get values of the template)
      *      'form_id' - The form ID (optional - if passed, will exec the form.isValid() function before anything and only proceed if it returns true)
+     *      'validation' - An Handler::js to validate somethings before sending the Ajax Request - if this functions returns false, the Ajax request is not sent. It is checked after the form validation.
      * 
      */
     public static function ajax(array $cfg)
@@ -60,8 +61,11 @@ class Handler
         // form validation
         $check_form = isset($cfg['form_id']) ? "if(!Ext.getCmp('{$cfg['form_id']}').getForm().isValid())return;" : '';
 
+        // validation
+        $validation = isset($cfg['validation']) ? "if(false === (" . substr($cfg['validation'], 1, -1) . ")())return;" : '';
+
         // the JS function
-        return "%function() { {$check_form} S.s();Ext.data.JsonP.request({url:'{$url}',params: {i:JSON.stringify({$params})},failure: S.failure, success: S.success[Ext.getCmp('s-win') ? 'win' : 'normal']}); }%";
+        return "%function() { {$check_form} {$validation} S.s();Ext.data.JsonP.request({url:'{$url}',params: {i:JSON.stringify({$params})},failure: S.failure, success: S.success[Ext.getCmp('s-win') ? 'win' : 'normal']}); }%";
     }
 
     /**

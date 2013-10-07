@@ -459,13 +459,22 @@ class App
                             else {
 
                                 // if we got here we are trying to enter a URL we do not have access to, so we'll redirect the user to the login form
-                                $message = new Message();
+                                if (!isset($_GET['callback']) && !(isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest')) {
 
-                                $header = new Header('Location', $cfg['paths']['base_path']);
-                                $message->addHeader($header);
+                                    // for NON JSONP requests and NON AJAX requests
+                                    $message = new Message();
 
-                                $response = new Response($message);
-                                $response->send();
+                                    $header = new Header('Location', $cfg['paths']['base_path']);
+                                    $message->addHeader($header);
+
+                                    $response = new Response($message);
+                                    $response->send();
+                                } else {
+
+                                    // check for a JSONP/AJAX request (in this case we can't simple send an header with Location to the homepage, we need to send a javascript code
+                                    // that redirects the user to the homepage instead)
+                                    die("document.location.href = '{$cfg['paths']['base_path']}';");
+                                }
                             }
                         });
 
