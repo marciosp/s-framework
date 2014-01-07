@@ -54,9 +54,6 @@ $base_path = $cfg['paths']['base_path'];
                             url: '<?= $base_path; ?>',
                             bodyStyle: {padding: '10px'},
                             buttons: [{
-                                    text: '<?= App::t('RESET'); ?>',
-                                    handler: function() {this.up('form').getForm().reset();}
-                                }, {
                                     xtype: 'button',
                                     text: '<?= App::t('SIGNIN'); ?>',
                                     formBind: true,
@@ -69,6 +66,9 @@ $base_path = $cfg['paths']['base_path'];
                                             failure: function(form, action) {Ext.Msg.alert('<?= App::t('FAILED'); ?>', action.result.msg || '<?= App::t('TRYAGAINLATER'); ?>');}
                                         });
                                     }
+                                }, {
+                                    text: '<?= App::t('RESET'); ?>',
+                                    handler: function() {this.up('form').getForm().reset();}
                                 }],
                             items: [{
                                     xtype: 'fieldset',

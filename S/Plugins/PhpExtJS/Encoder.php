@@ -67,7 +67,7 @@ class Encoder
                 };
 
         // replace the functions back and take the double quotes of them
-        return str_replace(array('"%', '%"'), '', strtr(json_encode($r($anything)), $store));
+		return preg_replace("@\"\%(.*?)\%\"@", "$1", strtr(json_encode($r($anything)), $store));
     }
 
 }

@@ -30,6 +30,7 @@ class Minihelp
      * 
      * @param Widget $grid The Grid Widget
      * @param array $cfg Minihelp config (title, height, width, to)
+	 * @param array $b_cfg Button config
      * 
      * @return Minihelp widget
      * 
@@ -48,7 +49,7 @@ class Minihelp
      * and a third parameter that will receive true when we need to clear the filters before applying a new one.
      * It does work without this plus, but it speeds up the process.
      */
-    public static function create(Widget $grid, array $cfg = array())
+    public static function create(Widget $grid, array $cfg = array(), array $b_cfg = array())
     {
         
         // minihelp id
@@ -65,7 +66,7 @@ class Minihelp
         $grid->listeners['itemdblclick'] = Handler::js(array_merge($fn, array("Ext.getCmp('{$minihelp_id}').hide()")));
 
         // the button id
-        $button_id = 'btn' . rand();
+        $button_id = isset($b_cfg['id']) ? $b_cfg['id'] : 'btn' . rand();
 
         // the fields events
         $on = array();
@@ -79,14 +80,14 @@ class Minihelp
 
             // minihelp value - validation
             $on[] = "Ext.getCmp('{$field_id}').mhValue = Ext.getCmp('{$field_id}').value;"; // initial "value" property
-            $on[] = "Ext.getCmp('{$field_id}').validator = function(val){if(Ext.getCmp('{$field_id}').mhValue !== val)return 'Check the minihelp values!';return true;};";
+            $on[] = "Ext.getCmp('{$field_id}').validator = function(val){var f = Ext.getCmp('{$field_id}'); if(f.allowBlank && !val)return true;if(f.mhValue !== val)return 'Check the minihelp values!';return true;};";
         }
 
         // after store load, pick the record (if we have only one)
         $pick = "Ext.getCmp('{$button_id}').win.items[0].store.on('load', function(){var mh=Ext.getCmp('{$minihelp_id}');if(!mh)return;var g=mh.down('grid'),s=g.getStore(); s.data.items.length === 1 && g.fireEvent('itemdblclick', g, s.getAt(0));})";
 
         // the button
-        $button = Widget::Button(array(
+        $button = Widget::Button(array_merge($b_cfg, array(
                     'id' => $button_id,
                     'text' => '?',
                     'listeners' => array(
@@ -102,12 +103,17 @@ class Minihelp
                         "mh = mh || Ext.getCmp('{$minihelp_id}')",
                         "val && mh.down('grid').filter(store_field, val, true)"
                     )),
+					'reconfigure' => Handler::js(array(
+						"var store = arguments[0]",
+						"var mh = Ext.getCmp('{$minihelp_id}')",
+						"if(mh){mh.down('grid').reconfigure(store);}else {this.win.items[0].store = store;}"
+					)),
                     'handler' => Handler::js(array(
                         "var mh = Ext.getCmp('{$minihelp_id}')",
                         "if(mh){mh.show();return;}",
                         "Ext.createWidget(this.win.xtype, this.win).show()"
                     ))
-                ));
+                )));
 
         // creates the window
         $window = Widget::Window(array(

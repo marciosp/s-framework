@@ -111,6 +111,7 @@ $plugins = str_replace(array('"%', '%"'), '', json_encode(array_map(function($v)
                         Ext.data.JsonP.request({
                             url: url,
                             params: params,
+							timeout: 9999999,
                             success: Ext.Function.createSequence(Ext.getCmp('s-win') ? this.success.win : this.success.normal, fn_s || Ext.emptyFn),
                             failure: Ext.Function.createSequence(this.failure, fn_f || Ext.emptyFn)
                         });
@@ -242,18 +243,34 @@ $plugins = str_replace(array('"%', '%"'), '', json_encode(array_map(function($v)
                     return menu;
                 })(<?= $menus; ?>);
                 
+                // plugins
+                var plugins = <?= $plugins; ?>;
+                var toRight = ['->'];
+                for(var i in plugins)
+                    if('flex' in plugins[i]) {
+                        toRight = [];
+                        break;
+                    }
+                
                 // creates the Toolbar
                 var tbar = Ext.create('Ext.Toolbar', {
+                    layoutConfig: {align:'stretch'},
                     layout: {
                         overflowHandler: 'Menu'
                     },
-                    items: Ext.Array.merge(menus, ['->'], <?= $plugins; ?>, [
+                    items: Ext.Array.merge(menus, toRight, plugins, [
                         '-',
-                        {xtype: 'tbspacer', width: 50},
+                        {xtype: 'tbspacer', width: 10},
                         // Logout button
                         {
-                            text: '<?= App::t('LOGOUT'); ?>',
-                            handler: function() {document.location.href += 'logout';}
+                            text: '<?= strtoupper(S\App::user()->login); ?>',
+                            menu: {
+                                items: [{
+                                        text: '<?= App::t('LOGOUT'); ?>',
+                                        padding: '5px 0 5px 0',
+                                        handler: function() {document.location.href += 'logout';}
+                                    }]
+                            }
                         }
                     ]),
                     renderTo: Ext.getBody()

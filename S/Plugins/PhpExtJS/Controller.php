@@ -16,6 +16,11 @@ namespace S\Plugins\PhpExtJS;
 // O ExtJS Plugin
 use O\UI\Plugins\ExtJS\Manager as m;
 
+// V.Http
+use \V\Http\Header;
+use \V\Http\Message;
+use \V\Http\Response;
+
 /**
  * 
  * Your controller must extend this class
@@ -270,6 +275,58 @@ abstract class Controller extends \O\Controller
 
     /**
      * 
+     * Confirms something to the ser
+     * 
+	 * @param string $title The confirm title
+	 * @param string $msg The confirm message
+	 * @param array $fns Array with key 'yes' having a Handler and 'no' having another Handler (both optional - at least one must be put)
+	 *
+     * @return array
+     * 
+     * @author Vitor de Souza <vitor_souza@outlook.com>
+     * @date 31/07/2013
+     */
+    final protected function confirm($title, $msg, array $fns)
+    {
+        isset($fns['yes']) || $fns['yes'] = 'S.h';
+        isset($fns['no']) || $fns['no'] = 'S.h';
+        $yes = trim($fns['yes'], '%');
+        $no = trim($fns['no'], '%');
+        
+        $title = addslashes($title);
+        $msg = addslashes($msg);
+        
+        
+        echo "Ext.Msg.confirm('{$title}', '{$msg}', function(ans){(ans === 'yes' ? ({$yes}) : ({$no})).apply(this, arguments);});";
+        return $this->ok();
+    }
+	
+	/**
+     * 
+     * Prompt something to the ser
+     * 
+	 * @param string $title The confirm title
+	 * @param string $msg The confirm message
+	 * @param string $fn A Handler
+	 *
+     * @return array
+     * 
+     * @author Vitor de Souza <vitor_souza@outlook.com>
+     * @date 27/11/2013
+     */
+    final protected function prompt($title, $msg, $fn)
+    {
+        $fn = trim($fn, '%');
+        
+        $title = addslashes($title);
+        $msg = addslashes($msg);
+        
+        echo "Ext.Msg.prompt('{$title}', '{$msg}', function(ans){(ans === 'ok' ? ({$fn}) : S.h).apply(this, arguments);});";
+        return $this->ok();
+    }
+
+    /**
+     * 
      * store the Controller with all the changes in the Repo in each request
      * 
      * @return void
@@ -333,6 +390,23 @@ abstract class Controller extends \O\Controller
                     'msg' => $msg
                 )) . ');');
     }
+	
+	/**
+     * 
+     * Send to download
+     * 
+     * @param string $url The File URL
+	 * @param string $temp Default true - true if the file is in the temp folder
+     * 
+     * @return void
+     * 
+     * @author Vitor de Souza <vitor_souza@outlook.com>
+     * @date 19/12/2013
+     */
+	protected function download($url, $temp = true)
+	{
+		echo 'window.open("' . (($temp ? \Siscorp\URL_TEMP : '') . $url) . '");';
+	}
 
     /**
      * 
@@ -347,12 +421,12 @@ abstract class Controller extends \O\Controller
     {
         return function($errno, $errstr, $errfile, $errline) {
 
-                    // clear the buffer
-                    ob_get_contents() && ob_clean();
-
                     // if we are using the @ before the sentence
                     if (error_reporting() === 0)
                         return;
+						
+                    // clear the buffer
+                    ob_get_contents() && ob_clean();
 
                     // get the constant (E_*)
                     $constants = get_defined_constants(true);
@@ -361,13 +435,25 @@ abstract class Controller extends \O\Controller
                     // check for REST Request (the error must be sent in json instead of HTML)
                     $cfg = \S\App::cfg();
                     if (false !== strpos(trim($_SERVER['REQUEST_URI'], '/'), trim($cfg['paths']['base_path'], '/') . '/webservices/')) {
-                        die(Encoder::encode(array(
-                                    'errtype' => $errtype,
-                                    'err' => $errstr,
-                                    'errfile' => $errfile,
-                                    'errline' => $errline
-                                )));
+						$message = new Message();
+						$message->setStatusCode(500);
+						$message->setBody(Encoder::encode(array(
+							'errtype' => $errtype,
+							'err' => $errstr,
+							'errfile' => $errfile,
+							'errline' => $errline
+						)));
+						
+						$response = new Response($message);
+						$response->send();
+						
+                        die();
                     }
+					
+					// PROD message
+					if($cfg['environment'] === 'PRODUCTION') {
+						die(Controller::err($errstr));
+					}
 
                     // generates the trace
                     $exception = new \Exception('');
@@ -403,12 +489,19 @@ abstract class Controller extends \O\Controller
                     // check for REST Request (the error must be sent in json instead of HTML)
                     $cfg = \S\App::cfg();
                     if (false !== strpos(trim($_SERVER['REQUEST_URI'], '/'), trim($cfg['paths']['base_path'], '/') . '/webservices/')) {
-                        die(Encoder::encode(array(
-                                    'exceptiontype' => get_class($e),
-                                    'exception' => $e->getMessage(),
-                                    'exceptionfile' => $e->getFile(),
-                                    'exceptionline' => $e->getLine()
-                                )));
+						$message = new Message();
+						$message->setStatusCode(500);
+						$message->setBody(Encoder::encode(array(
+							'exceptiontype' => get_class($e),
+							'exception' => $e->getMessage(),
+							'exceptionfile' => $e->getFile(),
+							'exceptionline' => $e->getLine()
+						)));
+						
+						$response = new Response($message);
+						$response->send();
+						
+                        die();
                     }
 
                     // generates the trace
@@ -416,6 +509,11 @@ abstract class Controller extends \O\Controller
 
                     // the message
                     $msg = nl2br($e->getMessage());
+					
+					// PROD message
+					if($cfg['environment'] === 'PRODUCTION') {
+						die(Controller::err($msg));
+					}
 
                     // the exception message
                     $exception_msg = "<div style='overflow:auto;max-height:300px;max-width:570px;white-space:nowrap;'><b>Type:</b> " . get_class($e) . "<br/><b>Exception:</b> {$msg}<br/><b>Exceptionfile:</b> {$e->getFile()}<br/><b>Exceptionline:</b> {$e->getLine()}<br/><b>Trace:</b> <br/>{$trace}</div>";

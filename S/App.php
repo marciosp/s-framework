@@ -184,11 +184,12 @@ class App
                         'base_path' => $cfg['paths']['base_path'],
                         //
                         // Default S Routes
-                        'routes' => array(
+                        'routes' => array_merge(array(
                             //
                             // Webservices
                             'webservices/{api}[/*]' => array(
                                 'do' => function($api, $params = '') use($cfg) {
+									
                                     $request = new Request;
 
                                     // get the API LOCATOR (check whether the request is coming from a module)
@@ -322,14 +323,24 @@ class App
                                     $response = new Response($message);
                                     $response->send();
                                 }
-                            )
-                        ),
+                            ),
+							//
+							// External scripts that may want to use S Framework can be loaded through this URL /load/var/www/html/myscript.php
+                            'load[/*]' => array(
+                                'do' => function($file = '') use($cfg) {
+									$file = DIRECTORY_SEPARATOR . ltrim($file, DIRECTORY_SEPARATOR);
+									if($file && file_exists($file))
+										include $file;
+								}
+							)
+                        ), isset($cfg['extra_routes']) ? $cfg['extra_routes'] : array()),
                         // 
                         // route filters (default lock for access to systems and webservices)
                         'filters' => array(
                             //
                             // this one protects your webservices/apis (if you don't want to protect it, just create a function that returns true in your config :D)
                             'auth_apis' => function(RouteInterface $route, RequestInterface $request) use($cfg) {
+								
                                 //
                                 // call user API auth closure (expects return of true or false), passing HTTP BASIC USER and HTTP BASIC PASSWORD 
                                 // (by default, S expects you'll use basic authentication with your webservices)
@@ -378,7 +389,7 @@ class App
         // error & exception handling
         isset($cfg['error_handler']) && is_callable($cfg['error_handler']) && set_error_handler($cfg['error_handler']);
         isset($cfg['exception_handler']) && is_callable($cfg['exception_handler']) && set_exception_handler($cfg['exception_handler']);
-
+		
         // load translations stuff
         $this->loadTranslations();
 
@@ -480,6 +491,7 @@ class App
 
         // some events (NOT FOUND treatment)
         $route_not_found = new Hook($app, 'route_not_found', function($app, $e, $router, $routes, $request, $dispatcher) use($cfg) {
+							
                             $cfg['REST']['errors']['404']($app, $e, $router, $routes, $request, $dispatcher);
                         });
 

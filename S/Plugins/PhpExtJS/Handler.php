@@ -41,6 +41,7 @@ class Handler
      *      'params' - The parameters to pass (an array of identifier => javascript codes that get values of the template)
      *      'form_id' - The form ID (optional - if passed, will exec the form.isValid() function before anything and only proceed if it returns true)
      *      'validation' - An Handler::js to validate somethings before sending the Ajax Request - if this functions returns false, the Ajax request is not sent. It is checked after the form validation.
+     *      'confirm' - An array('Confirm title', 'Confirm message') when we want to ask the user for confirmation before firing the handler
      * 
      */
     public static function ajax(array $cfg)
@@ -64,8 +65,16 @@ class Handler
         // validation
         $validation = isset($cfg['validation']) ? "if(false === (" . substr($cfg['validation'], 1, -1) . ")())return;" : '';
 
+        // the confirm
+        $confirm = 'handler.apply(this, args);';
+        if (isset($cfg['confirm'])) {
+            $title = htmlentities($cfg['confirm'][0], ENT_COMPAT | ENT_HTML401, 'ISO-8859-1');
+            $msg = htmlentities($cfg['confirm'][1], ENT_COMPAT | ENT_HTML401, 'ISO-8859-1');
+            $confirm = "Ext.Msg.confirm('{$title}', '{$msg}', function(ans){if(ans === 'yes') {$confirm};});";
+        }
+
         // the JS function
-        return "%function() { {$check_form} {$validation} S.s();Ext.data.JsonP.request({url:'{$url}',params: {i:JSON.stringify({$params})},failure: S.failure, success: S.success[Ext.getCmp('s-win') ? 'win' : 'normal']}); }%";
+        return "%function() { var args = arguments; var handler = function(){ {$check_form} {$validation} S.s();Ext.data.JsonP.request({url:'{$url}',timeout:999999999,params: {i:JSON.stringify({$params})},failure: S.failure, success: S.success[Ext.getCmp('s-win') ? 'win' : 'normal']});}; {$confirm} }%";
     }
 
     /**
@@ -82,7 +91,10 @@ class Handler
      */
     public static function js(array $codes)
     {
-        return "%function() { " . implode(';', $codes) . " }%";
+		$imp = preg_replace_callback("@á|é|í|ó|ú|à|è|ì|ò|ù|ã|õ|â|ê|î|ô|ô|ä|ë|ï|ö|ü|ç|Á|É|Í|Ó|Ú|À|È|Ì|Ò|Ù|Ã|Õ|Â|Ê|Î|Ô|Û|Ä|Ë|Ï|Ö|Ü|Ç@", function($r) {
+			return htmlentities($r[0], ENT_COMPAT | ENT_HTML401, 'ISO-8859-1');
+		}, implode(';', $codes));
+        return "%function() {{$imp}}%";
     }
 
     /**
