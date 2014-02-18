@@ -29,6 +29,7 @@ class Handler
      * Returns an JSONP function call to get back to the controller
      * 
      * @param array $cfg An config array
+     * @param string $module Module name if the handler comes within a module
      * 
      * @return string the JS function
      * 
@@ -44,7 +45,7 @@ class Handler
      *      'confirm' - An array('Confirm title', 'Confirm message') when we want to ask the user for confirmation before firing the handler
      * 
      */
-    public static function ajax(array $cfg)
+    public static function ajax(array $cfg, $module=false)
     {
 
         // the controller
@@ -63,7 +64,7 @@ class Handler
         $check_form = isset($cfg['form_id']) ? "if(!Ext.getCmp('{$cfg['form_id']}').getForm().isValid())return;" : '';
 
         // validation
-        $validation = isset($cfg['validation']) ? "if(false === (" . substr($cfg['validation'], 1, -1) . ")())return;" : '';
+        $validation = isset($cfg['validation']) ? "if(false === (" . substr($cfg['validation'], 1, -1) . ").apply(this, args))return;" : '';
 
         // the confirm
         $confirm = 'handler.apply(this, args);';
@@ -72,9 +73,13 @@ class Handler
             $msg = htmlentities($cfg['confirm'][1], ENT_COMPAT | ENT_HTML401, 'ISO-8859-1');
             $confirm = "Ext.Msg.confirm('{$title}', '{$msg}', function(ans){if(ans === 'yes') {$confirm};});";
         }
+        
+        // module
+        $module_params = '';
+        $module && ($module_params = "module: true, module_name: '{$module}',");
 
         // the JS function
-        return "%function() { var args = arguments; var handler = function(){ {$check_form} {$validation} S.s();Ext.data.JsonP.request({url:'{$url}',timeout:999999999,params: {i:JSON.stringify({$params})},failure: S.failure, success: S.success[Ext.getCmp('s-win') ? 'win' : 'normal']});}; {$confirm} }%";
+        return "%function() { var args = arguments; var handler = function(){ {$check_form} {$validation} S.s();Ext.data.JsonP.request({url:'{$url}',timeout:999999999,params: { {$module_params} i:JSON.stringify({$params})},failure: S.failure, success: S.success[Ext.getCmp('s-win') ? 'win' : 'normal']});}; {$confirm} }%";
     }
 
     /**

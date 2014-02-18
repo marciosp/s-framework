@@ -403,9 +403,9 @@ abstract class Controller extends \O\Controller
      * @author Vitor de Souza <vitor_souza@outlook.com>
      * @date 19/12/2013
      */
-	protected function download($url, $temp = true)
+	protected function download($url)
 	{
-		echo 'window.open("' . (($temp ? \Siscorp\URL_TEMP : '') . $url) . '");';
+		echo "window.open('{$url}');";
 	}
 
     /**

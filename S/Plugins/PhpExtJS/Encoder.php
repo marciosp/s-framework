@@ -38,7 +38,10 @@ class Encoder
      */
     public static function encode($anything)
     {
-
+    	
+    	// clone recursively to don't mess with $anything outside of this method
+		$anything = duplicate($anything);
+		
         // will store IDs and correspondents JS Functions
         $store = array();
 
@@ -70,4 +73,28 @@ class Encoder
 		return preg_replace("@\"\%(.*?)\%\"@", "$1", strtr(json_encode($r($anything)), $store));
     }
 
+}
+
+/**
+ *
+ * Clone recursively
+ *
+ * @param object|array $o Anything we want to clone
+ *
+ * @return mixed
+ *
+ * @author Vitor de Souza <vitor_souza@outlook.com>
+ * @date 27/09/2013
+ *
+ */
+function duplicate($o)
+{
+	if (is_object($o)) {
+		$o = clone $o;
+		foreach ($o as $k => $v)
+			$o->$k = duplicate($v);
+	} elseif (is_array($o))
+	foreach ($o as $k => $v)
+		$o[$k] = duplicate($v);
+	return $o;
 }

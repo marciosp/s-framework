@@ -84,7 +84,8 @@ $base_path = $cfg['paths']['base_path'];
                                     items: [{
                                             fieldLabel: '<?= App::t('USERFIELD'); ?>',
                                             name: 'user',
-                                            id: 'user'
+                                            id: 'user',
+                                            vtype: 'alphanum'
                                         }, {
                                             fieldLabel: '<?= App::t('PASSWORDFIELD'); ?>',
                                             name: 'pass',

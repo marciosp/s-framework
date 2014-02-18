@@ -80,7 +80,7 @@ class Minihelp
 
             // minihelp value - validation
             $on[] = "Ext.getCmp('{$field_id}').mhValue = Ext.getCmp('{$field_id}').value;"; // initial "value" property
-            $on[] = "Ext.getCmp('{$field_id}').validator = function(val){var f = Ext.getCmp('{$field_id}'); if(f.allowBlank && !val)return true;if(f.mhValue !== val)return 'Check the minihelp values!';return true;};";
+            $on[] = "Ext.getCmp('{$field_id}').validator = function(val){var f = Ext.getCmp('{$field_id}'); if(f.allowBlank && !val)return true;if(f.mhValue !== f.getValue())return 'Check the minihelp values!';return true;};";
         }
 
         // after store load, pick the record (if we have only one)

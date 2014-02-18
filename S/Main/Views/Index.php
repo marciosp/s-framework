@@ -44,6 +44,9 @@ if (isset($cfg['paths']['modules_path'])) {
 
             // include the Module.php config file
             $module_cfg = include $fileInfo->getPathname() . DIRECTORY_SEPARATOR . 'Module.php';
+            
+            // check if we will load the module
+            if(!$module_cfg) continue;
 
             // get the menus
             $cfg_menus[$module_cfg['name']] = $module_cfg['menus'];
@@ -214,8 +217,9 @@ $plugins = str_replace(array('"%', '%"'), '', json_encode(array_map(function($v)
                             items: buildMenus(m[i])
                         } : null,
                         handler: Ext.isObject(m[i]) ? null : (function(id) {
+                            var p = id;
                             return function() {
-                                
+                                id = p;
                                 // modules treatment
                                 var module_key = '<?= $module_key; ?>', 
                                 module_key_len = module_key.length, 

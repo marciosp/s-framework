@@ -118,5 +118,22 @@ class Widget
     {
         self::$alias[$alias] = $xtype;
     }
+    
+    /**
+     *
+     * create Store
+     *
+     * @param string $type Class name (e.g. TreeStore)
+     * @param array $cfg The store config
+     *
+     * @return string
+     *
+     * @author Vitor de Souza <vitor_souza@outlook.com>
+     * @date 24/01/2014
+     */
+    public static function store($type, $cfg)
+    {
+    	return "%(function() { return new Ext.data.{$type}(" . Encoder::encode($cfg) . "); })()%";
+    }
 
 }
